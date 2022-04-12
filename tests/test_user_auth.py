@@ -47,10 +47,10 @@ class TestUserAuth(BaseCase):
         )
 
     """
-            user_id_from_check_method = response2.json()["user_id"]
-            print(user_id_from_check_method)
+         user_id_from_check_method = response2.json()["user_id"]
+         print(user_id_from_check_method)
 
-            assert self.user_id_from_auth_method == user_id_from_check_method, "User id from auth method is not equal to the user from check method"
+         assert self.user_id_from_auth_method == user_id_from_check_method, "User id from auth method is not equal to the user from check method"
     """
 
     @pytest.mark.parametrize('condition', exclude_params)
