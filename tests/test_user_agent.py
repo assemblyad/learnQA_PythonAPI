@@ -45,9 +45,10 @@ class TestCheckUserAgent:
         response = requests.get(url, headers=data)
         obj = json.loads(response.text)
         """
-        print(response)
+        print(response.status_code)
+        print(response.content)
         print(response.text)
-        print(obj)
+        print(response)
         """
         response_browser_name = obj.get("browser")
         response_device_name = obj.get("device")
