@@ -1,8 +1,10 @@
 import requests
+from lib.my_requests import MyRequest
 
 class TestRequestMethodOnCookie():
     def test_cookie_validation(self):
-        response1 = requests.get("https://playground.learnqa.ru/api/homework_cookie")
+        response1 = MyRequest.get("/api/homework_cookie")
+        #response1 = requests.get("https://playground.learnqa.ru/api/homework_cookie")
         print(response1.cookies)
         expected_cookie_name = 'HomeWork'
         expected_cookie_value = 'hw_value'

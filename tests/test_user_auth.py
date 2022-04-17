@@ -3,7 +3,7 @@ import requests
 
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
-
+from lib.my_requests import MyRequest
 
 class TestUserAuth(BaseCase):
     exclude_params = [
@@ -17,7 +17,8 @@ class TestUserAuth(BaseCase):
             'password': '1234'
         }
 
-        response1 = requests.post("https://playground.learnqa.ru/api/user/login", data=data)
+        response1 =  MyRequest.post("/api/user/login", data=data)
+        #response1 = requests.post("https://playground.learnqa.ru/api/user/login", data=data)
         #print(response1.headers)
         #print(response1.cookies)
         # assert "auth_sid" in response1.cookies, "There is no auth cookie in the response"
@@ -32,11 +33,17 @@ class TestUserAuth(BaseCase):
         # self.user_id_from_auth_method = response1.json()["user_id"]
 
     def test_user_auth(self):
+
+        response2 = MyRequest.get("/api/user/auth",
+            headers={"x-csrf-token": self.token},
+            cookies={"auth_sid": self.auth_sid})
+        """
         response2 = requests.get(
             "https://playground.learnqa.ru/api/user/auth",
             headers={"x-csrf-token": self.token},
             cookies={"auth_sid": self.auth_sid}
         )
+        """
 
         # assert "user_id" in response2.json(), "There is no user_id in the second response"
         Assertions.assert_json_value_by_name(
@@ -58,16 +65,26 @@ class TestUserAuth(BaseCase):
         # user_id_from_auth_method = response1.json()["user_id"]
 
         if condition == "no_cookie":
+            response2 = MyRequest.get("/api/user/auth",
+                headers={"x-csrf-token": self.token}
+            )
+            """
             response2 = requests.get(
                 "https://playground.learnqa.ru/api/user/auth",
                 headers={"x-csrf-token": self.token}
             )
+            """
         else:
             condition == "no_token"
+            response2 = MyRequest.get("/api/user/auth",
+                cookies={"auth_sid": self.auth_sid}
+            )
+            """                          
             response2 = requests.get(
                 "https://playground.learnqa.ru/api/user/auth",
                 cookies={"auth_sid": self.auth_sid}
             )
+            """
 
         Assertions.assert_json_value_by_name(
             response2,

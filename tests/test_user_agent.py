@@ -2,6 +2,7 @@ import requests
 import pytest
 import json
 
+from lib.my_requests import MyRequest
 
 class TestCheckUserAgent:
     data = [
@@ -42,7 +43,8 @@ class TestCheckUserAgent:
         url = "https://playground.learnqa.ru/ajax/api/user_agent_check"
         data = {"user-agent": agent}
 
-        response = requests.get(url, headers=data)
+        response = MyRequest.get("/ajax/api/user_agent_check", headers=data)
+        #response = requests.get(url, headers=data)
         obj = json.loads(response.text)
         """
         print(response.status_code)

@@ -1,8 +1,13 @@
 import requests
 
+from lib.my_requests import MyRequest
+
+
 class TestRequestMethodOnHeader():
     def test_header_validation(self):
-        response = requests.get("https://playground.learnqa.ru/api/homework_header")
+
+        response = MyRequest.get("/api/homework_header")
+        #response = requests.get("https://playground.learnqa.ru/api/homework_header")
         print(response.headers)
 
         expected_header_name = 'x-secret-homework-header'
