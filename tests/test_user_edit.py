@@ -67,7 +67,7 @@ class TestUserEdit(BaseCase):
         # print(response4.json())
         Assertions.assert_json_value_by_name(response4, "firstName", new_name, "Wrong name of the user after edit")
 
-#- Попытаемся изменить данные пользователя, будучи неавторизованными
+    # - Попытаемся изменить данные пользователя, будучи неавторизованными
     def test_edit_user_without_auth(self):
         new_name = "Changed name"
 
@@ -77,45 +77,45 @@ class TestUserEdit(BaseCase):
 
         Assertions.assert_code_status(response3, 400)
 
-#- Попытаемся изменить данные пользователя, будучи авторизованными другим пользователем
+    # - Попытаемся изменить данные пользователя, будучи авторизованными другим пользователем
     def test_edit_user_details_that_is_not_the_same_as_logged(self):
-        # REGISTER
+        # REGISTER FIRST USER
         register_data = self.prepare_registration_data()
-        # url1 = "https://playground.learnqa.ru/api/user/"
         response1 = MyRequest.post("/api/user/", data=register_data)
-        # response1 = requests.post(url1, data=register_data)
         Assertions.assert_code_status(response1, 200)
         Assertions.assert_json_has_key(response1, "id")
-
+        """
         email = register_data['email']
         first_name = register_data['firstName']
         password = register_data['password']
         user_id = self.get_json_value(response1, "id")
+        """
+        # REGISTER SECOND USER
+        register_data2 = self.prepare_registration_data()
+        response2 = MyRequest.post("/api/user/", data=register_data2)
+        Assertions.assert_code_status(response2, 200)
+        Assertions.assert_json_has_key(response2, "id")
 
-        # LOGIN
+        user_id2 = self.get_json_value(response2, "id")
 
-        login_data = {
-            'email': email,
-            'password': password
-        }
+        # LOGIN WITH FIRST USER
 
-        response2 = MyRequest.post("/api/user/login", data=register_data)
+        response4 = MyRequest.post("/api/user/login", data=register_data)
 
-        auth_sid = self.get_cookie(response2, "auth_sid")
-        token = self.get_header(response2, "x-csrf-token")
+        auth_sid = self.get_cookie(response4, "auth_sid")
+        token = self.get_header(response4, "x-csrf-token")
 
-        # EDIT
+        # EDIT REGISTERED SECOND  USER
 
         new_name = "Changed name"
-        response3 = MyRequest.put("/api/user/2}",
+        response4 = MyRequest.put(f"/api/user/{user_id2}",
                                   data={"firstName": new_name},
                                   headers={"x-csrf-token": token},
                                   cookies={"auth_sid": auth_sid}
                                   )
+        Assertions.assert_code_status(response4, 400)
 
-        Assertions.assert_code_status(response3, 404)
-
-#- Попытаемся изменить email пользователя, будучи авторизованными тем же пользователем, на новый email без символа @
+    # - Попытаемся изменить email пользователя, будучи авторизованными тем же пользователем, на новый email без символа @
     def test_change_email_to_the_one_without_at_sign_of_the_same_logged_user(self):
         # REGISTER
         register_data = self.prepare_registration_data()
@@ -149,7 +149,7 @@ class TestUserEdit(BaseCase):
         assert response3.content.decode(
             "utf-8") == "Invalid email format", "Provided e mail for test has valid format while should not include '@' sign"
 
-#- Попытаемся изменить firstName пользователя, будучи авторизованными тем же пользователем, на очень короткое значение в один символ
+    # - Попытаемся изменить firstName пользователя, будучи авторизованными тем же пользователем, на очень короткое значение в один символ
     def test_change_firstName_of_same_as_logged_user(self):
         # REGISTER
         register_data = self.prepare_registration_data()
@@ -174,8 +174,8 @@ class TestUserEdit(BaseCase):
                                   cookies={"auth_sid": auth_sid}
                                   )
 
-        #print(response3.status_code)
-        #print(response3.content)
+        # print(response3.status_code)
+        # print(response3.content)
 
         Assertions.assert_code_status(response3, 400)
         actual_message_validation = self.get_json_value(response3, "error")
