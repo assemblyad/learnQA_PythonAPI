@@ -3,9 +3,12 @@ import requests
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
 from lib.my_requests import MyRequest
+import allure
 
-
+@allure.epic("User registration cases")
 class TestUserRegister(BaseCase):
+    @allure.severity("Critical")
+    @allure.description("This is positive case user registration")
     def test_create_user_successfully(self):
         data = self.prepare_registration_data()
         """
@@ -19,6 +22,10 @@ class TestUserRegister(BaseCase):
         # print(response.content)
         Assertions.assert_json_has_key(response, "id")
 
+
+    @allure.severity("Critical")
+    #@pytest.mark.xfail(condition=lambda: True, reason='this test is expecting failure')
+    @allure.description("This is positive case user registration")
     def test_create_user_with_existing_email(self):
         email = 'vinkotov@example.com'
         data = self.prepare_registration_data(email)
@@ -40,8 +47,13 @@ class TestUserRegister(BaseCase):
         assert response.content.decode(
             "utf-8") == f"Users with email '{email}' already exists", f"Unexpected response content {response.content}"
 
+    @allure.severity("Critical")
+    @allure.feature('Ex15: Тесты на метод user')
+    @allure.story('# - Создание пользователя с некорректным email - без символа @')
     # Ex15: Тесты на метод user
     # - Создание пользователя с некорректным email - без символа @
+    @allure.description("This is negative case to verify failure of user registration")
+    #@pytest.mark.xfail(condition=lambda: True, reason='this test is expecting failure')
     def test_create_user_not_successfully_without_at_sign(self):
         data = self.prepare_registration_data_with_no_at_sign()
         """
@@ -58,7 +70,7 @@ class TestUserRegister(BaseCase):
             "utf-8") == "Invalid email format", "Unexpected e mail format provided to test without @ sign"
         # Assertions.assert_json_has_key(response, "id")
 
-    # - Создание пользователя без указания одного из полей - с помощью @parametrize необходимо проверить, что отсутствие любого параметра не дает зарегистрировать пользователя
+# - Создание пользователя без указания одного из полей - с помощью @parametrize необходимо проверить, что отсутствие любого параметра не дает зарегистрировать пользователя
     data = [
         (
             "",
@@ -97,6 +109,10 @@ class TestUserRegister(BaseCase):
         )
     ]
 
+    @allure.severity("Critical")
+    @allure.description("This is negative case user registration")
+    @allure.feature('Ex15: Тесты на метод user')
+    @allure.story('# - Создание пользователя без указания одного из полей - с помощью @parametrize необходимо проверить, что отсутствие любого параметра не дает зарегистрировать пользователя')
     @pytest.mark.parametrize('password, username, firstName, lastName , email', data)
     def test_create_user_not_successfully_with_missing_part_of_registration(self, password, username, firstName, lastName, email):
 
@@ -134,6 +150,8 @@ class TestUserRegister(BaseCase):
         if email is None:
             assert response.content.decode("utf-8") == "The value of 'email' field is too short", "Not empty email provided for the test"
 
+    @allure.feature('Ex15: Тесты на метод user')
+    @allure.story('Создание пользователя с очень коротким именем в один символ')
 #- Создание пользователя с очень коротким именем в один символ
     def test_create_user_with_single_char_name(self):
         data = self.prepare_registration_data()
@@ -153,7 +171,9 @@ class TestUserRegister(BaseCase):
         Assertions.assert_code_status(response, response.status_code) == 400
         assert response.content.decode(
             "utf-8") == "The value of 'username' field is too short", "Not empty username provided for the test"
-#- Создание пользователя с очень длинным именем - длиннее 250 символов
+
+    @allure.feature('Ex15: Тесты на метод user')
+    @allure.story('Создание пользователя с очень длинным именем - длиннее 250 символов')
     def test_create_user_with_250_chars(self):
         data = self.prepare_registration_data()
         username1 =data['username'][:1]*251
